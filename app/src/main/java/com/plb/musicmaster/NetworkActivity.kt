@@ -8,24 +8,27 @@ import android.net.wifi.WifiManager
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
-import androidx.activity.ComponentActivity
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 
-class MoreActivity : AppCompatActivity() {
+class NetworkActivity : AppCompatActivity() {
 
     private lateinit var showIpButton: Button
     private lateinit var saveIpButton: Button
     private lateinit var ipInput: EditText
+    private lateinit var saveIp2Button: Button
+    private lateinit var ip2Input: EditText
     //var newIpAddress: String = "192.168.1.65" // Valor padrão
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_more)
+        setContentView(R.layout.activity_network)
 
         showIpButton = findViewById(R.id.showIpButton)
         saveIpButton = findViewById(R.id.saveIpButton)
-        ipInput = findViewById(R.id.ipInput) // Initialize ipInput here
+        ipInput = findViewById(R.id.ipInput)
+        saveIp2Button = findViewById(R.id.saveIp2Button)
+        ip2Input = findViewById(R.id.ip2Input)
 
         val toolbar: Toolbar = findViewById(R.id.toolbar)
         toolbar.setTitleTextColor(resources.getColor(android.R.color.white))
@@ -57,6 +60,22 @@ class MoreActivity : AppCompatActivity() {
             val sharedPreferences = getSharedPreferences("MyPreferences", Context.MODE_PRIVATE)
             val editor = sharedPreferences.edit()
             editor.putString("connectorIp", "192.168.1." + newIpAddress)
+            editor.apply()
+        }
+
+        saveIp2Button.setOnClickListener {
+            val newIpAddress = ip2Input.text.toString()
+            if (newIpAddress.isNotEmpty()) {
+                val resultIntent = Intent()
+                resultIntent.putExtra("NEW_IP_ADDRESS", newIpAddress)
+                setResult(Activity.RESULT_OK, resultIntent)
+                Toast.makeText(this, "IP Address saved: $newIpAddress", Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(this, "Please enter a valid IP Address", Toast.LENGTH_SHORT).show()
+            }
+            val sharedPreferences = getSharedPreferences("MyPreferences", Context.MODE_PRIVATE)
+            val editor = sharedPreferences.edit()
+            editor.putString("connectorIp", newIpAddress)
             editor.apply()
         }
     }

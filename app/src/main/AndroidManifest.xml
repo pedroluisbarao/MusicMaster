@@ -38,14 +38,19 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".MoreActivity"
+            android:name=".NetworkActivity"
             android:theme="@style/AppTheme"
-            android:label="More"
+            android:label="Network"
             android:screenOrientation="portrait"/>
         <activity
             android:name=".SongActivity"
             android:theme="@style/AppTheme"
             android:label="Song"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".SettingsActivity"
+            android:theme="@style/AppTheme"
+            android:label="Settings"
             android:screenOrientation="portrait"/>
 
 

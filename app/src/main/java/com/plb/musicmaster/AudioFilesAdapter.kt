@@ -3,6 +3,7 @@ package com.plb.musicmaster
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.compose.ui.graphics.Color
 import androidx.recyclerview.widget.RecyclerView
@@ -32,8 +33,10 @@ class AudioFilesAdapter(private val audioList: List<MainActivity.AudioFile>, pri
         val fileName = File(audioFile.path).name
         val title = audioFile.title // Get the title from the AudioFile data class
         val textView = holder.view.findViewById<TextView>(R.id.audioFileName)
+        val imageView = holder.view.findViewById<ImageView>(R.id.audioFileIcon)
 
-        textView.text = title // Set the title as the text
+        textView.text = "   "+title // Set the title as the text
+        SongActivity.MusicUtils.getMP3Metadata(audioFile.path, imageView) // Set the icon
         holder.view.setOnClickListener { onClick(audioFile.title, audioFile.path) }
     }
 

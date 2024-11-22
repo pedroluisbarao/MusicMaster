@@ -6,7 +6,11 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.BitmapFactory
 import android.media.MediaMetadataRetriever
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
+import android.view.GestureDetector
+import android.view.MotionEvent
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.SeekBar
@@ -27,6 +31,11 @@ class SongActivity : AppCompatActivity(), MusicServerListener {
     private lateinit var songLine: SeekBar
     private lateinit var timeRight: TextView
     private lateinit var timeLeft: TextView
+    private lateinit var areaLeft: TextView
+    private lateinit var areaRight: TextView
+    private lateinit var backwardButton: Button
+    private lateinit var forwardButton: Button
+    private var buttonState: String = "Play"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,9 +45,13 @@ class SongActivity : AppCompatActivity(), MusicServerListener {
         musicServer.setMusicServerListener(this)
         nextButton = findViewById(R.id.nextButton)
         previousButton = findViewById(R.id.previousButton)
+        areaLeft = findViewById(R.id.areaLeft)
+        areaRight = findViewById(R.id.areaRight)
         songLine = findViewById(R.id.line)
         timeRight = findViewById(R.id.time_right)
         timeLeft = findViewById(R.id.time_left)
+        backwardButton = findViewById(R.id.previous10sButton)
+        forwardButton = findViewById(R.id.next10sButton)
         musicServer.setSeekBar(songLine, timeLeft, timeRight)
         playButton = findViewById(R.id.playButton)
         songImageView = findViewById(R.id.songImageView)
@@ -47,7 +60,7 @@ class SongActivity : AppCompatActivity(), MusicServerListener {
         val sharedPreferences = getSharedPreferences("MyPreferences", Context.MODE_PRIVATE)
         var song = sharedPreferences.getString("lastplayedsong", "Over the Horizon")
         var songTitle = sharedPreferences.getString("lastplayedtitle", "Over the Horizon")
-        var buttonState = sharedPreferences.getString("buttonState", "Play")
+        buttonState = sharedPreferences.getString("buttonState", "Play").toString()
         val currentMode = sharedPreferences.getString("currentMode", "Slave")
 
         val toolbar: Toolbar = findViewById(R.id.toolbar)
@@ -75,6 +88,13 @@ class SongActivity : AppCompatActivity(), MusicServerListener {
             playButton.setBackgroundResource(R.drawable.button_pause)
         }
 
+        if (currentMode == ("Master")) {  //to make sure the correct songs plays when playbutton is pressed
+            val ipAddress = sharedPreferences.getString("connectorIp", "192.168.1.602")
+            val client = SocketClient(ipAddress, 12345) // Substitua com o IP do servidor
+            client.sendCommand("play $song")
+            client.sendCommand("stop")
+        }
+
         val mp3Info= MusicUtils.getMP3Metadata(musicServer.getSongPathFromName(song!!), songImageView)
         songName.text = songTitle
         songAlbumArtist.text = "${mp3Info["album"]} - ${mp3Info["artist"]}"
@@ -90,10 +110,9 @@ class SongActivity : AppCompatActivity(), MusicServerListener {
                     //playMusic()
                 }
                 else{
-                    //val song = sharedPreferences.getString("lastplayedsong", "Over the Horizon")
                     if (song != null){
-                        //musicServer.playSpecificMusic(song)
-                        musicServer.playMusic()
+                        musicServer.playSpecificMusic(song!!)
+                        //musicServer.playMusic()
                     }
 
                 }
@@ -113,44 +132,63 @@ class SongActivity : AppCompatActivity(), MusicServerListener {
                 buttonState = "Play"
                 MusicUtils.updatePlayButton(this, playButton,"Play")
             }
+            val mp3info = MusicUtils.getMP3Metadata(musicServer.getSongPath(), songImageView)
+            MusicUtils.updateSongInfo(this, songName,musicServer.getSongName(), musicServer.getSongTitle(), mp3info["album"], mp3info["artist"])
+            songAlbumArtist.text = "${mp3info["album"]} - ${mp3info["artist"]}"
+            //Toast.makeText(this, "here album artist", Toast.LENGTH_SHORT).show()
+        }
+
+
+        forwardButton.setOnClickListener {
+            musicServer.goForward10seconds()
+        }
+
+        backwardButton.setOnClickListener {
+            musicServer.goBackward10seconds()
         }
 
         nextButton.setOnClickListener {
+            val next = musicServer.getNextSongName(song!!)
             if(!musicServer.isPlaying()){ //avoid playing the song after the first one of the list
                 if (song != null) {
-                    musicServer.playSpecificMusic(song)
+                    musicServer.playSpecificMusic(song!!)
 
                 }
             }
             if (currentMode == ("Master")) {
                 val ipAddress = sharedPreferences.getString("connectorIp", "192.168.1.602")
                 val client = SocketClient(ipAddress, 12345) // Substitua com o IP do servidor
-                client.sendCommand("next")
+                client.sendCommand("play $next")
                 Toast.makeText(this, "Next command sent to $ipAddress", Toast.LENGTH_SHORT).show()
                 //nextMusic()
             }
             else{
                 musicServer.playNextMusic()
+                //Toast.makeText(this, "passa aqui nextButton", Toast.LENGTH_SHORT).show()
                 //MusicUtils.updateSongName(this, musicServer.getSongName())
                 //Log.d("next", "songNew: $songNew, songSharedPreferences: $song")
             }
             buttonState = "Pause"
             MusicUtils.updatePlayButton(this, playButton,"Pause")
-            val mp3info = MusicUtils.getMP3Metadata(musicServer.getSongPath(), songImageView)
-            MusicUtils.updateSongInfo(this, songName,musicServer.getSongName(), musicServer.getSongTitle(), mp3info["album"], mp3info["artist"])
+            val mp3info = MusicUtils.getMP3Metadata(musicServer.getSongPathFromName(next), songImageView)
+            MusicUtils.updateSongInfo(this, songName,next, musicServer.getSongTitleFromName(next), mp3info["album"], mp3info["artist"])
+            songAlbumArtist.text = "${mp3info["album"]} - ${mp3info["artist"]}"
+            //Toast.makeText(this, "here album artist", Toast.LENGTH_SHORT).show()
+            song = next
         }
 
         previousButton.setOnClickListener {
+            val previous = musicServer.getPreviousSongName(song!!)
             if(!musicServer.isPlaying()){ //avoid playing the song after the first one of the list
                 if (song != null) {
-                    musicServer.playSpecificMusic(song)
+                    musicServer.playSpecificMusic(song!!)
 
                 }
             }
             if (currentMode == ("Master")) {
                 val ipAddress = sharedPreferences.getString("connectorIp", "192.168.1.602")
                 val client = SocketClient(ipAddress, 12345) // Substitua com o IP do servidor
-                client.sendCommand("previous")
+                client.sendCommand("play $previous")//em vez disto: client.sendCommand("previous") estamos a indicar o nome a reproduzir
                 Toast.makeText(this, "Previous command sent to $ipAddress", Toast.LENGTH_SHORT).show()
                 //previousMusic()
 
@@ -163,16 +201,25 @@ class SongActivity : AppCompatActivity(), MusicServerListener {
             buttonState = "Pause"
             MusicUtils.updatePlayButton(this, playButton, "Pause")
 
-            val mp3info = MusicUtils.getMP3Metadata(musicServer.getSongPath(), songImageView)
-            MusicUtils.updateSongInfo(this, songName,musicServer.getSongName(), musicServer.getSongTitle(), mp3info["album"], mp3info["artist"])
+            val mp3info = MusicUtils.getMP3Metadata(musicServer.getSongPathFromName(previous), songImageView)
+            MusicUtils.updateSongInfo(this, songName,previous, musicServer.getSongTitleFromName(previous), mp3info["album"], mp3info["artist"])
+            songAlbumArtist.text = "${mp3info["album"]} - ${mp3info["artist"]}"
+            song = previous
             //Log.d("mp3info", "album: ${mp3info["album"]}, artist: ${mp3info["artist"]}")
         }
         //MusicUtils.getMP3Metadata(musicServer.getSongPath(), songImageView)
 
+
     }
 
-
-
+    fun playSongFromMaster(songMaster: String){
+        musicServer.playSpecificMusic(songMaster)
+        buttonState = "Pause"
+        MusicUtils.updatePlayButton(this, playButton,"Pause")
+        val mp3info = MusicUtils.getMP3Metadata(musicServer.getSongPathFromName(songMaster), songImageView)
+        MusicUtils.updateSongInfo(this, songName,songMaster, musicServer.getSongTitleFromName(songMaster), mp3info["album"], mp3info["artist"])
+        songAlbumArtist.text = "${mp3info["album"]} - ${mp3info["artist"]}"
+    }
 
     object MusicUtils {
 
@@ -211,6 +258,8 @@ class SongActivity : AppCompatActivity(), MusicServerListener {
             val retriever = MediaMetadataRetriever()
 
             // Use the file path to set the data source
+            Log.d("FilePath ERRRORRRRRR", "Path: $filePath")
+
             retriever.setDataSource(filePath)
 
             // Extract album, artist, and album art metadata
@@ -226,7 +275,7 @@ class SongActivity : AppCompatActivity(), MusicServerListener {
                 val albumCover = BitmapFactory.decodeByteArray(albumArtBytes, 0, albumArtBytes.size)
                 // Set the album cover to an ImageView
                 albumImageView.setImageBitmap(albumCover)
-                Toast.makeText(albumImageView.context, "Album art found!!", Toast.LENGTH_SHORT).show()
+                //Toast.makeText(albumImageView.context, "Album art found!!", Toast.LENGTH_SHORT).show()
             } else {
                 // No album art found, set a default image
                 albumImageView.setImageResource(R.drawable.music_master_icon2)
@@ -239,26 +288,67 @@ class SongActivity : AppCompatActivity(), MusicServerListener {
                 "album" to album,
                 "artist" to artist
             )
+
+
         }
     }
 
-
-
     override fun onMusicStopped(songName: String) {
+        nextButton.performClick()
         runOnUiThread {
             // Handle music stop here
             //Toast.makeText(this, "$songName has finished playing", Toast.LENGTH_SHORT).show()
             // Update your UI, switch to next song, etc.
-            songLine.progress = 0
-            nextButton.performClick()
+            //songLine.progress = 0
+            Toast.makeText(this, "here onMusicStopped", Toast.LENGTH_SHORT).show()
+
         }
     }
 
-
-
+    override fun onNewMusicFromMaster(songName: String) {
+        runOnUiThread {
+            playSongFromMaster(songName)
+        }
+    }
 
 
 }
 
 
+
+class SwipeGestureListener(
+    val context: Context,
+    val onSwipeLeft: () -> Unit,
+    val onSwipeRight: () -> Unit
+) : GestureDetector.SimpleOnGestureListener() {
+
+    private val SWIPE_THRESHOLD = 100
+    private val SWIPE_VELOCITY_THRESHOLD = 100
+
+
+    override fun onFling(
+        e1: MotionEvent?,
+        e2: MotionEvent,
+        velocityX: Float,
+        velocityY: Float
+    ): Boolean {
+        val diffX = e2?.x?.minus(e1?.x ?: 0f) ?: 0f
+        val diffY = e2?.y?.minus(e1?.y ?: 0f) ?: 0f
+
+        return if (Math.abs(diffX) > Math.abs(diffY)) {
+            if (Math.abs(diffX) > SWIPE_THRESHOLD && Math.abs(velocityX) > SWIPE_VELOCITY_THRESHOLD) {
+                if (diffX > 0) {
+                    onSwipeRight() // Swipe to the right
+                } else {
+                    onSwipeLeft()  // Swipe to the left
+                }
+                true
+            } else {
+                false
+            }
+        } else {
+            false
+        }
+    }
+}
 

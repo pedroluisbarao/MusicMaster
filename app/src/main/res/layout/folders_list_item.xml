@@ -5,15 +5,8 @@
     android:padding="16dp"
     android:orientation="horizontal">
 
-    <ImageView
-        android:id="@+id/audioFileIcon"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:src="@drawable/music_master_icon2"
-        android:contentDescription="@string/app_name" />
-
     <TextView
-        android:id="@+id/audioFileName"
+        android:id="@+id/FolderName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textColor="#FFFFFF"

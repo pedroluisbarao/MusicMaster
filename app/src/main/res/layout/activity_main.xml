@@ -13,10 +13,20 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
+        android:layout_marginBottom="10dp"
+        android:layout_marginTop="10dp"
         android:gravity="center">
 
+        <Button
+            android:id="@+id/moreButton"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginEnd="60dp"
+
+            android:background="@drawable/button_more"/>
+
         <TextView
-            android:id="@+id/MuiscMasterTextView"
+            android:id="@+id/MusicMasterTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="20sp"
@@ -28,31 +38,17 @@
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:src="@drawable/music_master_icon2"
-            android:layout_marginEnd="10dp"/>
-
-    </LinearLayout>
-    <!-- Section 1: Control Buttons -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center"
-        android:layout_marginBottom="24dp"
-        android:layout_marginTop="20dp">
-
-        <Button
-            android:id="@+id/moreButton"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_marginEnd="25dp"
-            android:background="@drawable/button_more"/>
+            android:layout_marginEnd="60dp"/>
 
         <Button
             android:id="@+id/settingsButton"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:background="@drawable/button_settings"/>
+
     </LinearLayout>
+    <!-- Section 1: Control Buttons -->
+
 
     <RadioGroup
         android:id="@+id/modeRadioGroup"
@@ -90,10 +86,43 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:background="@drawable/button_border"
+        android:layout_marginBottom="10dp"
         android:orientation="vertical">
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="20dp"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/allSongsButton"
+                android:text="All Songs"
+                android:textColor="@color/white"
+                android:layout_width="120dp"
+                android:layout_height="20dp"
+                android:background="@drawable/button_border" />
+
+            <Button
+                android:id="@+id/playlistsButton"
+                android:text="Playlists"
+                android:textColor="@color/white"
+                android:layout_width="120dp"
+                android:layout_height="20dp"
+                android:background="@drawable/button_border" />
+
+            <Button
+                android:id="@+id/artistsButton"
+                android:text="Artists"
+                android:textColor="@color/white"
+                android:layout_width="120dp"
+                android:layout_height="20dp"
+                android:background="@drawable/button_border" />
+
+        </LinearLayout>
+
         <ScrollView
+            android:id="@+id/audioSscrollView"
+            android:background="@drawable/button_border"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
@@ -102,6 +131,47 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:scrollbars="vertical" />
+
+
+        </ScrollView>
+        <ScrollView
+            android:id="@+id/FolderScrollView"
+            android:background="@drawable/button_border"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/FolderRecyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:scrollbars="vertical"
+                android:visibility="gone"/>
+        </ScrollView>
+        <ScrollView
+            android:id="@+id/SongsFolderScrollView"
+            android:background="@drawable/button_border"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/SongsFolderRecyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:scrollbars="vertical"
+                android:visibility="gone"/>
+        </ScrollView>
+        <ScrollView
+            android:id="@+id/ArtistScrollView"
+            android:background="@drawable/button_border"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/ArtistRecyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:scrollbars="vertical"
+                android:visibility="gone"/>
         </ScrollView>
     </LinearLayout>
 
@@ -111,14 +181,14 @@
         android:orientation="horizontal"
         android:gravity="center_vertical"
         android:background="@drawable/playbar_border"
-        android:layout_marginBottom="10dp"
+        android:layout_marginBottom="20dp"
         android:layout_marginTop="20dp">
 
         <!-- Image and song text on the left -->
         <ImageView
             android:id="@+id/songImageView"
-            android:layout_width="37dp"
-            android:layout_height="37dp"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
             android:src="@drawable/music_master_icon2"
             android:layout_marginStart="10dp"/>
 
@@ -128,7 +198,7 @@
             android:layout_height="wrap_content"
             android:text="Xxxxxxxxxxxxxx"
             android:textColor="@android:color/white"
-            android:textSize="30sp"
+            android:textSize="24sp"
             android:layout_marginStart="10dp"
             android:layout_weight="1"/>
 
@@ -137,7 +207,7 @@
             android:id="@+id/playButtonBottom"
             android:layout_width="30dp"
             android:layout_height="30dp"
-            android:layout_marginEnd="10dp"
+            android:layout_marginEnd="15dp"
             android:background="@drawable/button_play"/>
     </LinearLayout>
 
@@ -147,7 +217,8 @@
         android:layout_height="wrap_content"
         android:text="MusicMaster September, 2024"
         android:textColor="@android:color/white"
-        android:textSize="15sp" />
+        android:textSize="15sp"
+        android:visibility="gone"/>
 
 
 

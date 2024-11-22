@@ -72,7 +72,8 @@ class MusicServer(private val context: Context, private val port: Int) {
                         message!!.startsWith("play ") -> {
                             // Extract the music name by removing the "play " prefix
                             val musicName = message!!.substringAfter("play ").trim()
-                            playSpecificMusic(musicName) // Pass the music name to the playMusic method
+                            //playSpecificMusic(musicName) // Pass the music name to the playMusic method
+                            musicServerListener?.onNewMusicFromMaster(musicName)
                             writer.println("Playing: $musicName")
                         }
                         message == "play" -> {
@@ -82,6 +83,7 @@ class MusicServer(private val context: Context, private val port: Int) {
                         }
                         message == "stop" -> {
                             stopMusic()
+                            //musicServerListener?.onStopFromMaster()
                             writer.println("Music is stopped")
                         }
                         else -> writer.println("Unknown command")
@@ -98,30 +100,6 @@ class MusicServer(private val context: Context, private val port: Int) {
             }
         }
     }
-
-    /*fun loadMusicList() {
-        val musicUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
-        val projection = arrayOf(MediaStore.Audio.Media._ID, MediaStore.Audio.Media.DISPLAY_NAME)
-
-        val cursor = context.contentResolver.query(musicUri, projection, null, null, null)
-        cursor?.use {
-            while (it.moveToNext()) {
-                val id = it.getLong(it.getColumnIndexOrThrow(MediaStore.Audio.Media._ID))
-                val songName = it.getString(it.getColumnIndexOrThrow(MediaStore.Audio.Media.DISPLAY_NAME))
-                val uri = ContentUris.withAppendedId(musicUri, id)
-                musicList.add(Pair(songName, uri))
-                Log.d("MusicList", "Title: $songName, URI: $musicUri")
-            }
-        }
-
-        // Sort the musicList alphabetically by song name
-        musicList.sortBy { it.first }
-
-        // Set the current index to 0 if there are any songs
-        if (musicList.isNotEmpty()) {
-            currentMusicIndex = 0
-        }
-    }*/
 
     fun loadMusicList() {
         val musicUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
@@ -154,76 +132,12 @@ class MusicServer(private val context: Context, private val port: Int) {
         if (music != null) {
             // Set the current music index to the index of the selected music
             currentMusicIndex = musicList.indexOf(music) // Update index to the new music
-
-            mediaPlayer?.reset()
-            mediaPlayer = MediaPlayer().apply {
-                setDataSource(context, music.second)
-                prepare()
-            }
-            mediaPlayer?.start()
-            seekBar?.max = songDuration()
-            setupSeekBar()
-            mediaPlayer?.setOnCompletionListener {
-                musicServerListener?.onMusicStopped(music.first)
-                //playNextMusic() // Automatically play the next music after completion
-            }
+            playMusicFromCurrentIndex()
             // Optionally show a toast or update UI here
         } else {
             Toast.makeText(context, "Music file not found", Toast.LENGTH_SHORT).show()
         }
     }
-
-    /*    fun playSpecificMusic(musicName: String) {
-        // Search for the music by name and play it
-        val music = musicList.find { it.first.equals(musicName, ignoreCase = true) }
-        if (music != null) {
-            mediaPlayer?.reset()
-            mediaPlayer = MediaPlayer().apply {
-                setDataSource(context, music.second)
-                prepare()
-            }
-            mediaPlayer?.start()
-            mediaPlayer?.setOnCompletionListener {
-                musicServerListener?.onMusicStopped(music.first)
-                //playNextMusic()
-            }
-            //Toast.makeText(context, "Playing: ${music.first}", Toast.LENGTH_SHORT).show()
-        } else {
-            Toast.makeText(context, "Music file not found", Toast.LENGTH_SHORT).show()
-        }
-    }*/
-
-
-    /*fun playSpecificMusic(musicName: String) {
-        val musicUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
-        val projection = arrayOf(MediaStore.Audio.Media._ID, MediaStore.Audio.Media.DISPLAY_NAME)
-        val selection = "${MediaStore.Audio.Media.DISPLAY_NAME} = ?"
-        val selectionArgs = arrayOf(musicName)
-
-        val cursor = context.contentResolver.query(musicUri, projection, selection, selectionArgs, null)
-
-        cursor?.use {
-            if (it.moveToFirst()) {
-                val id = it.getLong(it.getColumnIndexOrThrow(MediaStore.Audio.Media._ID))
-                val uri = ContentUris.withAppendedId(musicUri, id)
-                mediaPlayer?.reset()
-                mediaPlayer = MediaPlayer().apply {
-                    setDataSource(context, uri)
-                    prepare()
-                }
-                mediaPlayer?.start()
-                //createMediaNotification()
-            } else {
-                Toast.makeText(context, "Music file not found", Toast.LENGTH_SHORT).show()
-            }
-        } ?: run {
-            val handler = Handler(Looper.getMainLooper())
-            handler.post {
-                Toast.makeText(context, "Error accessing media library", Toast.LENGTH_SHORT).show()
-            }
-
-        }
-    }*/
 
     fun playMusic() {
         mediaPlayer?.let {
@@ -252,7 +166,9 @@ class MusicServer(private val context: Context, private val port: Int) {
         if (musicList.isEmpty()) return
 
         // Move to the next music
+        //Toast.makeText(context, "Playing next music before $currentMusicIndex", Toast.LENGTH_SHORT).show()
         currentMusicIndex = (currentMusicIndex + 1) % musicList.size // Loop back to start
+        //Toast.makeText(context, "Playing next music new $currentMusicIndex", Toast.LENGTH_SHORT).show()
         playMusicFromCurrentIndex()
     }
 
@@ -277,9 +193,9 @@ class MusicServer(private val context: Context, private val port: Int) {
             seekBar?.max = songDuration()
             setupSeekBar()
             mediaPlayer?.setOnCompletionListener {
-
-                musicServerListener?.onMusicStopped(music.first)
-                //playNextMusic()
+                //val nextMusic = musicList[currentMusicIndex +1]
+                musicServerListener?.onMusicStopped("#")
+                //Toast.makeText(context, "Playing next music after listener  $currentMusicIndex", Toast.LENGTH_SHORT).show()
             }
 
         } else {
@@ -309,6 +225,22 @@ class MusicServer(private val context: Context, private val port: Int) {
             }
         }
         return "No music playing"
+    }
+
+    fun getSongTitleFromName(musicName: String): String{
+        val musicUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
+        val projection = arrayOf(MediaStore.Audio.Media._ID, MediaStore.Audio.Media.DISPLAY_NAME, MediaStore.Audio.Media.TITLE)
+        val selection = "${MediaStore.Audio.Media.DISPLAY_NAME} = ?"
+        val selectionArgs = arrayOf(musicName)
+
+        val cursor = context.contentResolver.query(musicUri, projection, selection, selectionArgs, null)
+        cursor?.use {
+            if (it.moveToFirst()) {
+                val title = it.getString(it.getColumnIndexOrThrow(MediaStore.Audio.Media.TITLE))
+                return title
+            }
+        }
+        return "No music with that name"
     }
 
     fun getSongPath(): String {
@@ -342,7 +274,7 @@ class MusicServer(private val context: Context, private val port: Int) {
                 return path
             }
         }
-        return "No music playing"
+        return "No music with that name"
     }
 
     fun isPlaying(): Boolean {
@@ -351,6 +283,29 @@ class MusicServer(private val context: Context, private val port: Int) {
 
     fun songDuration(): Int {
         return mediaPlayer?.duration ?: 0
+    }
+
+    fun goForward10seconds() {
+        mediaPlayer?.let {
+            val currentPosition = it.currentPosition
+            val duration = it.duration
+            val forwardTime = 10000 // 10 seconds
+            val newTime = currentPosition + forwardTime
+            if (newTime < duration) {
+                it.seekTo(newTime)
+            }
+        }
+    }
+
+    fun goBackward10seconds() {
+        mediaPlayer?.let {
+            val currentPosition = it.currentPosition
+            val backwardTime = 10000 // 10 seconds
+            val newTime = currentPosition - backwardTime
+            if (newTime > 0) {
+                it.seekTo(newTime)
+            }
+        }
     }
 
 
@@ -399,6 +354,130 @@ class MusicServer(private val context: Context, private val port: Int) {
             }
         }
     }
+
+    fun getFolders(): Array<String> {
+        val foldersSet = mutableSetOf<String>()
+        val musicUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
+        val projection = arrayOf(MediaStore.Audio.Media.DATA)
+
+        // Query the media store for all audio files on the device
+        val cursor = context.contentResolver.query(musicUri, projection, null, null, null)
+        cursor?.use {
+            while (it.moveToNext()) {
+                val path = it.getString(it.getColumnIndexOrThrow(MediaStore.Audio.Media.DATA))
+                val folderPath = path.substring(0, path.lastIndexOf("/")) // Extract the folder path
+                foldersSet.add(folderPath) // Add the folder path to the set to ensure no duplicates
+            }
+        }
+
+        // Convert the set to an array and return
+        return foldersSet.toTypedArray()
+    }
+
+
+    fun getSongsFromFolder(folderPath: String): Array<String> {
+        val songsList = mutableListOf<String>()
+        val musicUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
+        val projection = arrayOf(MediaStore.Audio.Media.DISPLAY_NAME, MediaStore.Audio.Media.DATA)
+        val selection = "${MediaStore.Audio.Media.DATA} LIKE ?"
+        val selectionArgs = arrayOf("$folderPath/%") // Filter files that are in the folder
+
+        // Query the media store for audio files in the specified folder
+        val cursor = context.contentResolver.query(musicUri, projection, selection, selectionArgs, null)
+        cursor?.use {
+            while (it.moveToNext()) {
+                val songName = it.getString(it.getColumnIndexOrThrow(MediaStore.Audio.Media.DISPLAY_NAME))
+                val songPath = it.getString(it.getColumnIndexOrThrow(MediaStore.Audio.Media.DATA))
+                // Check if the song is directly in the folder and not in a subfolder
+                if (songPath.startsWith(folderPath)) {
+                    songsList.add(songName) // Add the song name to the list
+                }
+            }
+        }
+
+        // Return the list as an array
+        return songsList.toTypedArray()
+    }
+
+    fun getSongsFromArtist(artist: String): Array<String> {
+        val songsList = mutableListOf<String>()
+        val musicUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
+        val projection = arrayOf(MediaStore.Audio.Media.DISPLAY_NAME, MediaStore.Audio.Media.DATA, MediaStore.Audio.Media.ARTIST)
+        val selection = "${MediaStore.Audio.Media.ARTIST} = ?"
+        val selectionArgs = arrayOf(artist)
+
+        // Query the media store for audio files in the specified folder
+        val cursor = context.contentResolver.query(musicUri, projection, selection, selectionArgs, null)
+        cursor?.use {
+            while (it.moveToNext()) {
+                val songName = it.getString(it.getColumnIndexOrThrow(MediaStore.Audio.Media.DISPLAY_NAME))
+                val songPath = it.getString(it.getColumnIndexOrThrow(MediaStore.Audio.Media.DATA))
+                // Check if the song is directly in the folder and not in a subfolder
+                //if (songPath.startsWith(artist)) {
+                songsList.add(songPath) // Add the song name to the list
+                //}
+            }
+        }
+
+        // Return the list as an array
+        return songsList.toTypedArray()
+    }
+
+    fun getArtists(): Array<String> {
+        val artistsSet = mutableSetOf<String>()
+        val musicUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
+        val projection = arrayOf(MediaStore.Audio.Media.ARTIST)
+
+        // Query the media store for all audio files on the device
+        val cursor = context.contentResolver.query(musicUri, projection, null, null, null)
+        cursor?.use {
+            while (it.moveToNext()) {
+                val artist = it.getString(it.getColumnIndexOrThrow(MediaStore.Audio.Media.ARTIST))
+                artistsSet.add(artist) // Add the folder path to the set to ensure no duplicates
+            }
+        }
+
+        // Convert the set to an array and return
+        return artistsSet.toTypedArray()
+    }
+
+
+    fun getPreviousSongName(currentSongName: String): String {
+        val currentSongIndex = musicList.indexOfFirst { it.first == currentSongName }
+        val previousSongIndex = (currentSongIndex - 1 + musicList.size) % musicList.size
+        return musicList[previousSongIndex].first
+    }
+
+    fun getNextSongName(currentSongName: String): String {
+        val currentSongIndex = musicList.indexOfFirst { it.first == currentSongName }
+        val nextSongIndex = (currentSongIndex + 1) % musicList.size
+        return musicList[nextSongIndex].first
+    }
+
+
+    fun modifyMusicList(songs: Array<String>){
+        musicList.clear()
+        for (song in songs){
+            val musicUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
+            val projection = arrayOf(MediaStore.Audio.Media._ID, MediaStore.Audio.Media.DISPLAY_NAME, MediaStore.Audio.Media.TITLE)
+            val selection = "${MediaStore.Audio.Media.DISPLAY_NAME} = ?"
+            val selectionArgs = arrayOf(song)
+
+            val cursor = context.contentResolver.query(musicUri, projection, selection, selectionArgs, null)
+            cursor?.use {
+                if (it.moveToFirst()) {
+                    val id = it.getLong(it.getColumnIndexOrThrow(MediaStore.Audio.Media._ID))
+                    val title = it.getString(it.getColumnIndexOrThrow(MediaStore.Audio.Media.TITLE))
+                    val uri = ContentUris.withAppendedId(musicUri, id)
+                    musicList.add(Pair(song, uri))
+                    Log.d("Music Server List", "Title: $title")
+                }
+            }
+        }
+        currentMusicIndex = 0
+    }
+
+
     /*private fun setupSeekBar(seekBar: SeekBar) {
         // Set the maximum value of the seek bar to the duration of the song
         mediaPlayer?.setOnPreparedListener {
