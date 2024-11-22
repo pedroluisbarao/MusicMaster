@@ -1,0 +1,7 @@
+<!-- res/drawable/white_arrow.xml -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:drawable="@drawable/ic_baseline_arrow"
+    android:tint="#FFFFFF"
+    />
+</layer-list>

@@ -1,0 +1,143 @@
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="top|center_horizontal"
+    android:visibility="visible"
+    android:background="@color/black"
+    tools:context=".MainActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center">
+
+        <TextView
+            android:id="@+id/MuiscMasterTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="20sp"
+            android:text="@string/app_name"
+            android:textColor="@android:color/white"/>
+
+        <ImageView
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@drawable/music_master_icon2"
+            android:layout_marginEnd="10dp"/>
+
+    </LinearLayout>
+    <!-- Section 1: Control Buttons -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:layout_marginBottom="24dp"
+        android:layout_marginTop="20dp">
+
+        <Button
+            android:id="@+id/moreButton"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginEnd="25dp"
+            android:background="@drawable/button_more"/>
+
+        <Button
+            android:id="@+id/settingsButton"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginEnd="25dp"
+            android:background="@drawable/button_settings"/>
+
+        <Button
+            android:id="@+id/playButton"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginEnd="25dp"
+            android:background="@drawable/button_play"/>
+
+        <Button
+            android:id="@+id/stopButton"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="@drawable/button_stop"/>
+    </LinearLayout>
+
+    <RadioGroup
+        android:id="@+id/modeRadioGroup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <RadioButton
+            android:id="@+id/masterMode"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Master Mode"
+            android:textColor="@android:color/white"/>
+
+        <View
+            android:layout_width="40dp"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <RadioButton
+            android:id="@+id/slaveMode"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Slave Mode"
+            android:textColor="@android:color/white"/>
+    </RadioGroup>
+
+
+    <!-- New Section: Buttons Side by Side -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:layout_marginTop="50dp">
+
+
+
+        <Button
+            android:id="@+id/selectSampleButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Select Music Track"
+            android:textColor="@android:color/white"
+            android:background="@drawable/button_border"/>
+    </LinearLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/audioFilesRecyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:scrollbars="vertical" />
+    </ScrollView>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+    <!-- TextView that stays at the bottom -->
+    <TextView
+        android:id="@+id/statusTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="20dp"
+        android:text="MusicMaster September, 2024"
+        android:textColor="@android:color/white"
+        android:textSize="15sp" />
+
+</LinearLayout>

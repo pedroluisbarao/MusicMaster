@@ -1,0 +1,88 @@
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="top|center_horizontal"
+    android:visibility="visible"
+    android:background="@color/black"
+    tools:context=".MoreActivity">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/colorPrimary"
+        app:navigationIcon="@drawable/white_arrow" />
+
+    <TextView
+        android:id="@+id/ipInputText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:text="Enter IP Address to connect a device"
+        android:textColorHint="@android:color/white"
+        android:inputType="text"
+        android:textColor="@android:color/white"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:layout_marginTop="20dp">
+
+        <TextView
+            android:id="@+id/ipText"
+            android:layout_width="100dp"
+            android:layout_height="25dp"
+            android:text="192.168.1."
+            android:textSize="20dp"
+            android:textColorHint="@android:color/white"
+            android:textColor="@android:color/white"/>
+
+        <EditText
+            android:id="@+id/ipInput"
+            android:layout_width="50dp"
+            android:layout_height="25dp"
+            android:textSize="20dp"
+            android:hint="65"
+            android:textColorHint="@android:color/white"
+            android:inputType="text"
+            android:textColor="@android:color/white"
+            android:background="@color/gray"/>
+
+    </LinearLayout>
+
+    <!-- New Section: Buttons Side by Side -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:layout_marginTop="50dp">
+
+        <Button
+            android:id="@+id/showIpButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Show IP"
+            android:textColor="@android:color/white"
+            android:background="@drawable/button_border"/>
+
+        <Button
+            android:id="@+id/saveIpButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Save new IP connection"
+            android:textColor="@android:color/white"
+            android:background="@drawable/button_border"/>
+
+
+    </LinearLayout>
+
+</LinearLayout>
