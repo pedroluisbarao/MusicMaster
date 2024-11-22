@@ -1,0 +1,14 @@
+# Normalize all text files to LF on commit
+* text=auto
+
+# Binary files should not be modified
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.zip binary
+*.exe binary
+
+# Set specific line ending styles for particular files if needed
+*.bat text eol=crlf
+*.sh text eol=lf
