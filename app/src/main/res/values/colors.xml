@@ -8,12 +8,14 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="gray">#4D4646</color>
+    <color name="dark_gray">#1C1A1A</color>
     <color name="grid_background">#FF464646</color>
     <color name="button_transparent">#00FFFFFF</color>
     <color name="colorPrimary">#000000</color>
     <color name="colorPrimaryDark">#000000</color>
-    <color name="colorAccent">#03DAC5</color>
+    <color name="colorAccent">#66FE1C</color>
     <color name="colorOnPrimary">#FFFFFF</color>
     <color name="colorOnSecondary">#FFFFFF</color>
     <color name="colorOnBackground">#FFFFFF</color>
+    <color name="Green">#66FE1C</color>
 </resources>

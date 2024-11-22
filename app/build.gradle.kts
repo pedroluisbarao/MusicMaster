@@ -1,7 +1,6 @@
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
-    id ("kotlin-parcelize")
 
 
 }
@@ -65,9 +64,8 @@ dependencies {
     implementation("androidx.compose.material3:material3")
     implementation ("androidx.media:media:1.4.3")
     implementation ("androidx.recyclerview:recyclerview:1.2.1")
-    implementation("androidx.media3:media3-exoplayer:1.4.1")
+    implementation ("androidx.constraintlayout:constraintlayout:2.0.4")
 
-    implementation ("com.jakewharton.timber:timber:5.0.1") // Use the latest version
 
     /*implementation ("androidx.core:core:1.6.0")
     implementation ("androidx.media:media:1.5.0")*/

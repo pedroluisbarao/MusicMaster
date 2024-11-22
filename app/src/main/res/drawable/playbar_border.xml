@@ -1,0 +1,8 @@
+<!-- res/drawable/button_border.xml -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid android:color="@color/dark_gray"/> <!-- Cor de fundo do botão -->
+    <stroke
+        android:width="2dp"
+        android:color="@color/gray"/> <!-- Cor da borda (cinza) -->
+    <corners android:radius="10dp"/> <!-- Cantos arredondados (opcional) -->
+</shape>

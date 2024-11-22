@@ -1,0 +1,21 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Flipped Triangle -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M78,15 L78,93 L18,54 L78,15 Z"
+        android:strokeColor="#ffff"
+        android:strokeWidth="10"
+        android:strokeLineJoin="round" />
+
+    <!-- Bar (unchanged) -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M23,15 L18,15 L18,93 L23,93 Z"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="10"
+        android:strokeLineJoin="round"/>
+</vector>

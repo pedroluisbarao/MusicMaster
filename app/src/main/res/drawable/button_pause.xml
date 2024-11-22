@@ -1,0 +1,22 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- Left bar of the pause symbol -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M25,15 L35,15 L35,93 L25,93 Z"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="10"
+        android:strokeLineJoin="round"/>
+
+    <!-- Right bar of the pause symbol -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M70,15 L80,15 L80,93 L70,93 Z"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="10"
+        android:strokeLineJoin="round"/>
+</vector>
